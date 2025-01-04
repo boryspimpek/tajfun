@@ -8,11 +8,26 @@ int pwmLeftMotor = 14;  // Pin do sterowania prędkością lewego silnika
 int dirLeftMotor = 27;  // Pin do sterowania kierunkiem lewego silnika
 
 // LED pins
-const int redLedPin = 2;    // Pin for red LED
-const int greenLedPin = 4;  // Pin for green LED
-bool redLedState = false;    // Track red LED state
-bool greenLedState = false;  // Track green LED state
+const int turnSigLeft = 2;     
+const int turnSigRight = 4;    
+const int parkLight = 16;   
+const int lowBeamLight = 17;
+const int highBeamLight = 5;
+const int brakeLight = 18;
+const int tailLight = 19;
+const int reversLight = 21;
 
+// Variables to track LED states
+bool turnSigLeftState = false;    
+bool turnSigRightState = false;  
+bool parkLightState = false;
+bool lowBeamLightState = false;
+bool highBeamLightState = false;
+bool brakeLightState = false;
+bool tailLightState = false;
+bool reversLightState = false;
+
+// PWM setup
 const int PWMFreq = 1000; /* 1 KHz */
 const int PWMResolution = 8;
 const int rightMotorPWMSpeedChannel = 4;
@@ -48,10 +63,24 @@ void onDisConnect()
 {
   rotateMotor(0, 0);
   // Turn off LEDs on disconnect
-  digitalWrite(redLedPin, LOW);
-  digitalWrite(greenLedPin, LOW);
-  redLedState = false;
-  greenLedState = false;
+  digitalWrite(turnSigLeft, LOW);
+  digitalWrite(turnSigRight, LOW);
+  digitalWrite(parkLight, LOW);
+  digitalWrite(lowBeamLight, LOW);
+  digitalWrite(highBeamLight, LOW);
+  digitalWrite(brakeLight, LOW);
+  digitalWrite(tailLight, LOW);
+  digitalWrite(reversLight, LOW);
+
+  turnSigLeftState = false;
+  turnSigRightState = false;
+  parkLightState = false;
+  lowBeamLightState = false;
+  highBeamLightState = false;
+  brakeLightState = false;
+  tailLightState = false;
+  reversLightState = false;
+
   Serial.println("Disconnected!");
 }
 
@@ -100,10 +129,21 @@ void setUpPinModes()
   pinMode(dirLeftMotor, OUTPUT);
   
   // Setup LED pins
-  pinMode(redLedPin, OUTPUT);
-  pinMode(greenLedPin, OUTPUT);
-  digitalWrite(redLedPin, LOW);    // Initially off
-  digitalWrite(greenLedPin, LOW);  // Initially off
+  pinMode(turnSigLeft, OUTPUT);
+  pinMode(turnSigRight, OUTPUT);
+  pinMode(parkLight, OUTPUT);
+  pinMode(lowBeamLight, OUTPUT);
+  pinMode(highBeamLight, OUTPUT);
+  pinMode(brakeLight, OUTPUT);
+  pinMode(tailLight, OUTPUT);
+  pinMode(reversLight, OUTPUT);
+  digitalWrite(turnSigLeft, LOW);    // Initially off
+  digitalWrite(turnSigRight, LOW);  // Initially off
+  digitalWrite(parkLight, LOW);    // Initially off
+  digitalWrite(lowBeamLight, LOW);  // Initially off
+  digitalWrite(highBeamLight, LOW); // Initially off
+  digitalWrite(brakeLight, LOW);    // Initially off
+  digitalWrite(tailLight, LOW);     // Initially off
 
   // Konfiguracja PWM dla prędkości silników
   ledcSetup(rightMotorPWMSpeedChannel, PWMFreq, PWMResolution);
@@ -128,31 +168,31 @@ void setup()
 void loop()
 {
   if (PS4.isConnected()) {
-    static bool lastDownState = false;
-    static bool lastUpState = false;
+    static bool lastLeftState = false;
+    static bool lastRightState = false;
     
-    // Handle Down button for red LED
-    if (PS4.Down()) {
-      if (!lastDownState) {  // Button just pressed
-        redLedState = !redLedState;  // Toggle state
-        digitalWrite(redLedPin, redLedState ? HIGH : LOW);
-        Serial.println(redLedState ? "Red LED ON" : "Red LED OFF");
+    // Handle Left button for Left signal led
+    if (PS4.Left()) {
+      if (!lastLeftState) {  // Button just pressed
+        turnSigLeftState = !turnSigLeftState;  // Toggle state
+        digitalWrite(turnSigLeft, turnSigLeftState ? HIGH : LOW);
+        Serial.println(turnSigLeftState ? "Left sig ON" : "Left sig OFF");
       }
-      lastDownState = true;
+      lastLeftState = true;
     } else {
-      lastDownState = false;
+      lastLeftState = false;
     }
     
     // Handle Up button for green LED
     if (PS4.Up()) {
-      if (!lastUpState) {  // Button just pressed
-        greenLedState = !greenLedState;  // Toggle state
-        digitalWrite(greenLedPin, greenLedState ? HIGH : LOW);
-        Serial.println(greenLedState ? "Green LED ON" : "Green LED OFF");
+      if (!lastRightState) {  // Button just pressed
+        turnSigRightState = !turnSigRightState;  // Toggle state
+        digitalWrite(turnSigRight, turnSigRightState ? HIGH : LOW);
+        Serial.println(turnSigRightState ? "Right sig ON" : "Right sig OFF");
       }
-      lastUpState = true;
+      lastRightState = true;
     } else {
-      lastUpState = false;
+      lastRightState = false;
     }
   }
 }
