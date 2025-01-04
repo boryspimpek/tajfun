@@ -22,7 +22,7 @@ void notify()
 {
   int rightMotorSpeed, leftMotorSpeed;
 
-  // Mapowanie prędkości
+  // Mapowanie prędkości i cud miud
   rightMotorSpeed = map(PS4.RStickY(), -127, 127, -255, 255); // Right stick - Y-axis
   leftMotorSpeed = map(PS4.LStickY(), -127, 127, -255, 255);  // Left stick - Y-axis
 
