@@ -170,6 +170,9 @@ void loop()
   if (PS4.isConnected()) {
     static bool lastLeftState = false;
     static bool lastRightState = false;
+    static bool lastL1State = false;
+    static bool lastR1State = false;
+    static bool lastUpState = false;
     
     // Handle Left button for Left signal led
     if (PS4.Left()) {
@@ -183,8 +186,8 @@ void loop()
       lastLeftState = false;
     }
     
-    // Handle Up button for green LED
-    if (PS4.Up()) {
+    // Handle Right button Right signal led
+    if (PS4.Right()) {
       if (!lastRightState) {  // Button just pressed
         turnSigRightState = !turnSigRightState;  // Toggle state
         digitalWrite(turnSigRight, turnSigRightState ? HIGH : LOW);
@@ -193,6 +196,63 @@ void loop()
       lastRightState = true;
     } else {
       lastRightState = false;
+    }
+
+    // Handle L1 button for low beam light and tail light
+    if (PS4.L1()) {
+      if (!lastL1State) {  // Button just pressed
+        lowBeamLightState = !lowBeamLightState;  // Toggle state
+        tailLightState = !tailLightState;  // Toggle state
+        digitalWrite(lowBeamLight, lowBeamLightState ? HIGH : LOW);
+        digitalWrite(tailLight, tailLightState ? HIGH : LOW);
+        Serial.println(lowBeamLightState ? "Low beam ON" : "Low beam OFF");
+        Serial.println(tailLightState ? "Tail light ON" : "Tail light OFF");
+      }
+      lastL1State = true;
+    }  else {
+      lastL1State = false;
+    }
+
+    // Handle R1 button for high beam light
+    if (PS4.R1()) {
+      if (!lastR1State) {  // Button just pressed
+        highBeamLightState = !highBeamLightState;  // Toggle state
+        digitalWrite(highBeamLight, highBeamLightState ? HIGH : LOW);
+        Serial.println(highBeamLightState ? "High beam ON" : "High beam OFF");
+      }
+      lastR1State = true;
+    }  else {
+      lastR1State = false;
+    }
+
+    // Handle Up button for park light
+    if (PS4.Up()) {
+      if (!lastUpState) {  // Button just pressed
+        parkLightState = !parkLightState;  // Toggle state
+        digitalWrite(parkLight, parkLightState ? HIGH : LOW);
+        Serial.println(parkLightState ? "Park light ON" : "Park light OFF");
+      }
+      lastUpState = true;
+    }  else {
+      lastUpState = false;
+    }
+
+    // Handle reverse light
+    if (PS4.LStickY() < -30 || PS4.RStickY() < -30) {
+      digitalWrite(reversLight, HIGH);
+      reversLightState = true;
+    } else {
+      digitalWrite(reversLight, LOW);
+      reversLightState = false;
+    }
+
+    // Handle brake light
+    if (abs(PS4.LStickY()) < 30 && abs(PS4.RStickY()) < 30) {
+      digitalWrite(brakeLight, HIGH);
+      brakeLightState = true;
+    } else {
+      digitalWrite(brakeLight, LOW);
+      brakeLightState = false;
     }
   }
 }
