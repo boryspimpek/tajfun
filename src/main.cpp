@@ -33,6 +33,43 @@ const int PWMResolution = 8;
 const int rightMotorPWMSpeedChannel = 4;
 const int leftMotorPWMSpeedChannel = 5;
 
+void rotateMotor(int rightMotorSpeed, int leftMotorSpeed)
+{
+  // Prawy silnik
+  if (rightMotorSpeed > 30)
+  {
+    digitalWrite(dirRightMotor, HIGH); // Kierunek do przodu
+    ledcWrite(rightMotorPWMSpeedChannel, map(rightMotorSpeed, 30, 255, 255, 0)); 
+  }
+  else if (rightMotorSpeed < -30)
+  {
+    digitalWrite(dirRightMotor, LOW); // Kierunek wstecz
+    ledcWrite(rightMotorPWMSpeedChannel, map(abs(rightMotorSpeed), 30, 255, 0, 255)); 
+  }
+  else
+  {
+    digitalWrite(dirRightMotor, LOW);
+    ledcWrite(rightMotorPWMSpeedChannel, 0); // Całkowite zatrzymanie
+  }
+
+  // Lewy silnik
+  if (leftMotorSpeed > 30)
+  {
+    digitalWrite(dirLeftMotor, HIGH); // Kierunek do przodu
+    ledcWrite(leftMotorPWMSpeedChannel, map(leftMotorSpeed, 30, 255, 255, 0)); 
+  }
+  else if (leftMotorSpeed < -30)
+  {
+    digitalWrite(dirLeftMotor, LOW); // Kierunek wstecz
+    ledcWrite(leftMotorPWMSpeedChannel, map(abs(leftMotorSpeed), 30, 255, 0, 255)); 
+  }
+  else
+  {
+    digitalWrite(dirLeftMotor, LOW);
+    ledcWrite(leftMotorPWMSpeedChannel, 0); // Całkowite zatrzymanie
+  }
+}
+
 void notify()
 {
   int rightMotorSpeed, leftMotorSpeed;
@@ -82,43 +119,6 @@ void onDisConnect()
   reversLightState = false;
 
   Serial.println("Disconnected!");
-}
-
-void rotateMotor(int rightMotorSpeed, int leftMotorSpeed)
-{
-  // Prawy silnik
-  if (rightMotorSpeed > 30)
-  {
-    digitalWrite(dirRightMotor, HIGH); // Kierunek do przodu
-    ledcWrite(rightMotorPWMSpeedChannel, map(rightMotorSpeed, 30, 255, 255, 0)); 
-  }
-  else if (rightMotorSpeed < -30)
-  {
-    digitalWrite(dirRightMotor, LOW); // Kierunek wstecz
-    ledcWrite(rightMotorPWMSpeedChannel, map(abs(rightMotorSpeed), 30, 255, 0, 255)); 
-  }
-  else
-  {
-    digitalWrite(dirRightMotor, LOW);
-    ledcWrite(rightMotorPWMSpeedChannel, 0); // Całkowite zatrzymanie
-  }
-
-  // Lewy silnik
-  if (leftMotorSpeed > 30)
-  {
-    digitalWrite(dirLeftMotor, HIGH); // Kierunek do przodu
-    ledcWrite(leftMotorPWMSpeedChannel, map(leftMotorSpeed, 30, 255, 255, 0)); 
-  }
-  else if (leftMotorSpeed < -30)
-  {
-    digitalWrite(dirLeftMotor, LOW); // Kierunek wstecz
-    ledcWrite(leftMotorPWMSpeedChannel, map(abs(leftMotorSpeed), 30, 255, 0, 255)); 
-  }
-  else
-  {
-    digitalWrite(dirLeftMotor, LOW);
-    ledcWrite(leftMotorPWMSpeedChannel, 0); // Całkowite zatrzymanie
-  }
 }
 
 void setUpPinModes()
@@ -247,7 +247,7 @@ void loop()
     }
 
     // Handle brake light
-    if (abs(PS4.LStickY()) < 30 && abs(PS4.RStickY()) < 30) {
+    if (abs(PS4.LStickY()) == 0 && abs(PS4.RStickY()) == 0) {
       digitalWrite(brakeLight, HIGH);
       brakeLightState = true;
     } else {
