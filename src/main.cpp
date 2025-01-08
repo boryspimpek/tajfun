@@ -8,14 +8,14 @@ int pwmLeftMotor = 14;  // Pin do sterowania prędkością lewego silnika
 int dirLeftMotor = 27;  // Pin do sterowania kierunkiem lewego silnika
 
 // LED pins
-const int turnSigLeft = 2;     
-const int turnSigRight = 4;    
-const int parkLight = 16;   
-const int lowBeamLight = 17;
-const int highBeamLight = 5;
-const int brakeLight = 18;
-const int tailLight = 19;
-const int reversLight = 21;
+const int turnSigLeft = 21;      
+const int turnSigRight = 19;     
+const int parkLight = 5;    
+const int lowBeamLight = 18; 
+const int highBeamLight = 17; 
+const int brakeLight = 4; 
+const int tailLight = 2; 
+const int reversLight = 16; 
 
 // Variables to track LED states
 bool turnSigLeftState = false;    
@@ -238,7 +238,7 @@ void loop()
     }
 
     // Handle reverse light
-    if (PS4.LStickY() < -30 || PS4.RStickY() < -30) {
+    if ((PS4.LStickY() < -30 || PS4.RStickY() < -30) && digitalRead(2) == HIGH) {
       digitalWrite(reversLight, HIGH);
       reversLightState = true;
     } else {
@@ -247,7 +247,7 @@ void loop()
     }
 
     // Handle brake light
-    if (abs(PS4.LStickY()) == 0 && abs(PS4.RStickY()) == 0) {
+    if (abs(PS4.LStickY()) <= 30 && abs(PS4.RStickY()) <= 30 && digitalRead(2) == HIGH) {
       digitalWrite(brakeLight, HIGH);
       brakeLightState = true;
     } else {
