@@ -8,8 +8,8 @@ int pwmLeftMotor = 14;  // Pin do sterowania prędkością lewego silnika
 int dirLeftMotor = 27;  // Pin do sterowania kierunkiem lewego silnika
 
 // LED pins
-const int turnSigLeft = 21;      
-const int turnSigRight = 19;     
+const int turnSigLeft = 19;      
+const int turnSigRight = 21;     
 const int parkLight = 5;    
 const int lowBeamLight = 18; 
 const int highBeamLight = 17; 
@@ -165,8 +165,11 @@ void setup()
   Serial.println("Ready.");
 }
 
-void loop()
-{
+void loop() {
+  static unsigned long previousMillis = 0;
+  static bool ledState = false;
+  const long interval = 500;  // czas mrugania w milisekundach (0.5 sekundy)
+
   if (PS4.isConnected()) {
     static bool lastLeftState = false;
     static bool lastRightState = false;
@@ -174,11 +177,12 @@ void loop()
     static bool lastR1State = false;
     static bool lastUpState = false;
     
+    unsigned long currentMillis = millis();
+
     // Handle Left button for Left signal led
     if (PS4.Left()) {
       if (!lastLeftState) {  // Button just pressed
         turnSigLeftState = !turnSigLeftState;  // Toggle state
-        digitalWrite(turnSigLeft, turnSigLeftState ? HIGH : LOW);
         Serial.println(turnSigLeftState ? "Left sig ON" : "Left sig OFF");
       }
       lastLeftState = true;
@@ -190,7 +194,6 @@ void loop()
     if (PS4.Right()) {
       if (!lastRightState) {  // Button just pressed
         turnSigRightState = !turnSigRightState;  // Toggle state
-        digitalWrite(turnSigRight, turnSigRightState ? HIGH : LOW);
         Serial.println(turnSigRightState ? "Right sig ON" : "Right sig OFF");
       }
       lastRightState = true;
@@ -198,6 +201,24 @@ void loop()
       lastRightState = false;
     }
 
+    // Obsługa mrugania
+    if (currentMillis - previousMillis >= interval) {
+      previousMillis = currentMillis;
+      ledState = !ledState;  // zmiana stanu LED
+      
+      if (turnSigLeftState) {
+        digitalWrite(turnSigLeft, ledState ? HIGH : LOW);
+      } else {
+        digitalWrite(turnSigLeft, LOW);
+      }
+      
+      if (turnSigRightState) {
+        digitalWrite(turnSigRight, ledState ? HIGH : LOW);
+      } else {
+        digitalWrite(turnSigRight, LOW);
+      }
+    }  
+    
     // Handle L1 button for low beam light and tail light
     if (PS4.L1()) {
       if (!lastL1State) {  // Button just pressed
@@ -209,7 +230,7 @@ void loop()
         Serial.println(tailLightState ? "Tail light ON" : "Tail light OFF");
       }
       lastL1State = true;
-    }  else {
+    } else {
       lastL1State = false;
     }
 
@@ -221,7 +242,7 @@ void loop()
         Serial.println(highBeamLightState ? "High beam ON" : "High beam OFF");
       }
       lastR1State = true;
-    }  else {
+    } else {
       lastR1State = false;
     }
 
@@ -233,7 +254,7 @@ void loop()
         Serial.println(parkLightState ? "Park light ON" : "Park light OFF");
       }
       lastUpState = true;
-    }  else {
+    } else {
       lastUpState = false;
     }
 
