@@ -217,8 +217,8 @@ void loop() {
       } else {
         digitalWrite(turnSigRight, LOW);
       }
-    }  
-    
+    }  // Dodany nawias zamykający dla bloku "if (currentMillis...)"
+
     // Handle L1 button for low beam light and tail light
     if (PS4.L1()) {
       if (!lastL1State) {  // Button just pressed
