@@ -1,4 +1,6 @@
 #include <PS4Controller.h>
+#include "esp_bt.h"
+#include "esp_bt_main.h"
 
 //Right motor
 int pwmRightMotor = 12; // Pin do sterowania prędkością prawego silnika
@@ -32,6 +34,18 @@ const int PWMFreq = 1000; /* 1 KHz */
 const int PWMResolution = 8;
 const int rightMotorPWMSpeedChannel = 4;
 const int leftMotorPWMSpeedChannel = 5;
+
+void set_bt_mac() {
+  uint8_t new_mac[6] = { 0xA0, 0xDD, 0x6C, 0x0F, 0x35, 0x0A };  // Twój MAC
+  esp_err_t err = esp_base_mac_addr_set(new_mac);  // Próba ustawienia MAC
+
+  if (err == ESP_OK) {
+      Serial.println("Ustawiono nowy adres MAC Bluetooth!");
+  } else {
+      Serial.print("Błąd zmiany MAC: ");
+      Serial.println(err);
+  }
+}
 
 void rotateMotor(int rightMotorSpeed, int leftMotorSpeed)
 {
@@ -156,12 +170,14 @@ void setUpPinModes()
 
 void setup()
 {
+  set_bt_mac();  // Ustawienie MAC PRZED uruchomieniem Bluetooth
+
   setUpPinModes();
   Serial.begin(115200);
   PS4.attach(notify);
   PS4.attachOnConnect(onConnect);
   PS4.attachOnDisconnect(onDisConnect);
-  PS4.begin();
+  PS4.begin("a0:dd:6c:0f:35:0a");
   Serial.println("Ready.");
 }
 
